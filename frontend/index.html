@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Game Sales Explorer</title>
+
+    <style>
+/* Navigation */
+
+nav{
+
+    background:#162447;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:15px 40px;
+
+}
+
+.logo{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+.links a{
+
+    color:white;
+
+    text-decoration:none;
+
+    margin-left:25px;
+
+    font-size:17px;
+
+}
+
+.links a:hover{
+
+    color:#7fc8ff;
+
+}
+        body{
+            margin:0;
+            font-family:Arial, Helvetica, sans-serif;
+            background:#f4f4f4;
+        }
+
+        /* Hero */
+
+        .hero{
+            background:linear-gradient(135deg,#1e3c72,#2a5298);
+            color:white;
+            text-align:center;
+            padding:60px 20px;
+        }
+
+        .hero h1{
+            margin:0;
+            font-size:42px;
+        }
+
+        .hero p{
+            font-size:18px;
+            margin-top:15px;
+        }
+
+        /* Main container */
+
+        .container{
+            width:85%;
+            margin:30px auto;
+            background:white;
+            border-radius:12px;
+            padding:25px;
+            box-shadow:0 5px 15px rgba(0,0,0,.15);
+        }
+
+        /* Toolbar */
+
+        .toolbar{
+            display:flex;
+            justify-content:center;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-bottom:25px;
+        }
+
+        input,
+        select,
+        button{
+
+            padding:10px;
+            border-radius:8px;
+            border:1px solid #ccc;
+            font-size:15px;
+
+        }
+
+        input{
+            width:250px;
+        }
+
+        button{
+
+            background:#2a5298;
+            color:white;
+            border:none;
+            cursor:pointer;
+            transition:.2s;
+
+        }
+
+        button:hover{
+
+            background:#1e3c72;
+
+        }
+
+        /* Table */
+
+        table{
+
+            width:100%;
+            border-collapse:collapse;
+
+        }
+
+        th{
+
+            background:#2a5298;
+            color:white;
+            padding:12px;
+
+        }
+
+        td{
+
+            padding:12px;
+
+        }
+
+        tr:nth-child(even){
+
+            background:#f8f8f8;
+
+        }
+
+        tr:hover{
+
+            background:#dce9ff;
+            cursor:pointer;
+
+        }
+        /* ========================= */
+        /* Game Cards */
+        /* ========================= */
+
+        .games-grid{
+
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+            gap:20px;
+
+        }
+
+        .game-card{
+
+            background:white;
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+            transition:.3s;
+
+        }
+
+        .game-card:hover{
+
+            transform:translateY(-6px);
+
+            cursor:pointer;
+
+        }
+
+        .game-card img{
+
+            width:100%;
+            height:280px;
+            object-fit:cover;
+
+        }
+
+        .game-info{
+
+            padding:15px;
+
+        }
+
+        .game-info h3{
+
+            margin:0;
+
+        }
+
+        .game-info p{
+
+            color:#666;
+
+        }
+    </style>
+
+</head>
+
+<body>
+<nav>
+
+    <div class="logo">
+        🎮 Game Sales Explorer
+    </div>
+
+    <div class="links">
+
+        <a href="home.html">Home</a>
+        <a href="index.html">Explorer</a>
+        <a href="about.html">About</a>
+
+    </div>
+
+</nav>
+<div class="hero">
+
+    <h1>🎮 Game Sales Explorer</h1>
+
+    <p>
+        Search, filter and discover the best-selling video games.
+    </p>
+
+</div>
+
+<div class="container">
+
+<div class="toolbar">
+
+<input
+    type="text"
+    id="searchInput"
+    placeholder="Search game..."
+    onkeydown="if(event.key==='Enter') searchGame()"
+>
+    <button onclick="searchGame()">
+        Search
+    </button>
+
+    <select id="platformFilter">
+
+        <option value="">Platform</option>
+        <option value="Wii">Wii</option>
+        <option value="NES">NES</option>
+        <option value="GB">Game Boy</option>
+        <option value="DS">DS</option>
+
+    </select>
+
+    <select id="genreFilter">
+
+        <option value="">Genre</option>
+        <option value="Sports">Sports</option>
+        <option value="Platform">Platform</option>
+        <option value="Racing">Racing</option>
+        <option value="Puzzle">Puzzle</option>
+        <option value="Misc">Misc</option>
+
+    </select>
+
+    <select id="sortFilter">
+
+        <option value="">Sort</option>
+        <option value="top_sales">Top Sales</option>
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+
+    </select>
+
+    <button onclick="applyFilters()">
+        Apply
+    </button>
+
+</div>
+
+<div id="results" class="games-grid"></div>
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:8000"
+
+const covers = {
+
+    "Wii Sports": "images/wii_sports.jpg",
+
+    "Super Mario Bros.": "images/super_mario_bros.jpg",
+
+    "Mario Kart Wii": "images/mario_kart_wii.jpg",
+
+    "Wii Sports Resort": "images/wii_sports_resort.jpg",
+
+    "Pokemon Red/Pokemon Blue": "images/pokemon_red_blue.jpg",
+
+    "Tetris": "images/tetris.jpg",
+
+    "New Super Mario Bros.": "images/new_super_mario_bros.jpg",
+
+    "Wii Play": "images/wii_play.jpg",
+
+    "New Super Mario Bros. Wii": "images/new_super_mario_bros_wii.jpg",
+
+    "Duck Hunt": "images/duck_hunt.jpg"
+
+};
+
+function displayGames(games){
+
+    const container = document.getElementById("results")
+
+    container.innerHTML = ""
+
+    games.forEach(game => {
+        const cover = covers[game.Name] || "images/default.jpg";
+        const card = `
+
+        <div class="game-card"
+             onclick="openGame('${game.Name}')">
+
+            <img src="${cover}">
+
+            <div class="game-info">
+
+                <h3>${game.Name}</h3>
+
+                <p>${game.Platform} • ${game.Genre}</p>
+
+                <p>Released: ${game.Year}</p>
+
+            </div>
+
+        </div>
+
+        `
+
+        container.innerHTML += card
+
+    })
+
+}
+
+async function searchGame(){
+
+    const name = document.getElementById("searchInput").value
+
+    const response = await fetch(`${API}/games/search?name=${name}`)
+
+    const data = await response.json()
+
+    displayGames(data)
+
+}
+
+async function applyFilters(){
+
+    const platform = document.getElementById("platformFilter").value
+
+    const genre = document.getElementById("genreFilter").value
+
+    const sort = document.getElementById("sortFilter").value
+
+    let url = `${API}/games/filter?`
+
+    if(platform)
+        url += `platform=${platform}&`
+
+    if(genre)
+        url += `genre=${genre}&`
+
+    if(sort)
+        url += `sort=${sort}&`
+
+    const response = await fetch(url)
+
+    const data = await response.json()
+
+    displayGames(data)
+
+}
+
+function openGame(name){
+
+    window.location.href =
+        `game.html?name=${encodeURIComponent(name)}`
+
+}
+
+async function loadGames() {
+
+    const response = await fetch(`${API}/games`);
+
+    const data = await response.json();
+
+    displayGames(data);
+
+}
+
+loadGames();
+
+</script>
+
+</body>
+
+</html>

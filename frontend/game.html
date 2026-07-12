@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Game Details</title>
+
+    <style>
+
+        body{
+            margin:0;
+            font-family:Arial, Helvetica, sans-serif;
+            background:#f4f4f4;
+        }
+
+        /* =======================
+           Navigation
+        ======================= */
+
+        nav{
+
+            background:#162447;
+            color:white;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+
+            padding:15px 40px;
+
+        }
+
+        .logo{
+
+            font-size:22px;
+            font-weight:bold;
+
+        }
+
+        .links a{
+
+            color:white;
+            text-decoration:none;
+            margin-left:25px;
+            transition:.2s;
+
+        }
+
+        .links a:hover{
+
+            color:#7fc8ff;
+
+        }
+
+        /* =======================
+           Header
+        ======================= */
+
+        .header{
+
+            background:linear-gradient(135deg,#1e3c72,#2a5298);
+
+            color:white;
+
+            text-align:center;
+
+            padding:40px;
+
+        }
+
+        /* =======================
+           Main Container
+        ======================= */
+
+        .container{
+
+            width:85%;
+
+            margin:40px auto;
+
+            background:white;
+
+            border-radius:12px;
+
+            padding:35px;
+
+            box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+        }
+
+        /* =======================
+           Layout
+        ======================= */
+
+        .game-layout{
+
+            display:flex;
+
+            gap:40px;
+
+            flex-wrap:wrap;
+
+            align-items:flex-start;
+
+        }
+
+        .cover{
+
+            flex:1;
+
+            min-width:280px;
+
+        }
+
+        .cover img{
+
+            width:100%;
+
+            border-radius:12px;
+
+            box-shadow:0 5px 15px rgba(0,0,0,.2);
+
+        }
+
+        .details{
+
+            flex:2;
+
+            min-width:300px;
+
+        }
+
+        .details h2{
+
+            margin-top:0;
+
+            font-size:36px;
+
+            color:#1e3c72;
+
+        }
+
+        .info{
+
+            line-height:2;
+
+            font-size:18px;
+
+        }
+
+        .info strong{
+
+            color:#2a5298;
+
+        }
+
+        /* =======================
+           Description
+        ======================= */
+
+        .description{
+
+            margin-top:30px;
+
+            background:#f7f7f7;
+
+            padding:20px;
+
+            border-radius:10px;
+
+        }
+
+        .description h3{
+
+            margin-top:0;
+
+            color:#1e3c72;
+
+        }
+
+        /* =======================
+           Button
+        ======================= */
+
+        button{
+
+            margin-top:30px;
+
+            padding:12px 25px;
+
+            border:none;
+
+            border-radius:8px;
+
+            background:#2a5298;
+
+            color:white;
+
+            cursor:pointer;
+
+            transition:.2s;
+
+        }
+
+        button:hover{
+
+            background:#1e3c72;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<nav>
+
+    <div class="logo">
+
+        🎮 Game Sales Explorer
+
+    </div>
+
+    <div class="links">
+
+        <a href="home.html">Home</a>
+        <a href="index.html">Explorer</a>
+        <a href="about.html">About</a>
+
+    </div>
+
+</nav>
+
+<div class="header">
+
+    <h1>Game Details</h1>
+
+</div>
+
+<div class="container">
+
+    <div class="game-layout">
+
+        <div class="cover">
+
+            <img id="cover">
+
+        </div>
+
+        <div class="details">
+
+            <h2 id="title"></h2>
+
+            <div class="info" id="info"></div>
+
+            <div class="description">
+
+                <h3>Description</h3>
+
+                <p id="description">
+
+                    This page displays information retrieved dynamically from the FastAPI backend.
+                    The game details are loaded using the game name passed through the URL,
+                    demonstrating communication between the frontend and backend using JavaScript and REST APIs.
+
+                </p>
+
+            </div>
+
+            <button onclick="goBack()">
+
+                ⬅ Back to Explorer
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+
+const name = params.get("name");
+
+const API = "http://127.0.0.1:8000";
+const covers = {
+
+    "Wii Sports": "images/wii_sports.jpg",
+
+    "Super Mario Bros.": "images/super_mario_bros.jpg",
+
+    "Mario Kart Wii": "images/mario_kart_wii.jpg",
+
+    "Wii Sports Resort": "images/wii_sports_resort.jpg",
+
+    "Pokemon Red/Pokemon Blue": "images/pokemon_red_blue.jpg",
+
+    "Tetris": "images/tetris.jpg",
+
+    "New Super Mario Bros.": "images/new_super_mario_bros.jpg",
+
+    "Wii Play": "images/wii_play.jpg",
+
+    "New Super Mario Bros. Wii": "images/new_super_mario_bros_wii.jpg",
+
+    "Duck Hunt": "images/duck_hunt.jpg"
+
+};
+async function loadGame(){
+
+    const response = await fetch(`${API}/games/search?name=${name}`);
+
+    const data = await response.json();
+
+    if(data.length > 0){
+
+        const game = data[0];
+        const cover = covers[game.Name] || "images/default.jpg";
+
+        document.getElementById("cover").src = cover;
+        document.getElementById("title").innerText = game.Name;
+
+        document.getElementById("info").innerHTML = `
+            <strong>Platform:</strong> ${game.Platform}<br>
+            <strong>Genre:</strong> ${game.Genre}<br>
+            <strong>Publisher:</strong> ${game.Publisher}<br>
+            <strong>Release Year:</strong> ${game.Year}<br>
+            <strong>Global Sales:</strong> ${game.Global_Sales} Million Copies
+        `;
+    }
+
+}
+
+function goBack(){
+
+    window.location.href = "index.html";
+
+}
+
+loadGame();
+
+</script>
+
+</body>
+
+</html>
